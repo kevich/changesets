@@ -891,6 +891,28 @@ Mixed changesets that contain both ignored and not ignored packages are not allo
       expect(releases[0].newVersion).toEqual("1.0.1");
     });
 
+    it("should filter out packages with no version in pre mode", () => {
+      // @ts-ignore
+      setup.addPackage("pkg-undefined", undefined);
+      const { releases } = assembleReleasePlan(
+        setup.changesets,
+        setup.packages,
+        {
+          ...defaultConfig,
+        },
+        {
+          changesets: [],
+          tag: "next",
+          initialVersions: {},
+          mode: "pre",
+        }
+      );
+
+      expect(releases.length).toEqual(1);
+      expect(releases[0].name).toEqual("pkg-a");
+      expect(releases[0].newVersion).toEqual("1.0.1-next.0");
+    });
+
     it("should bump dev dependents when exiting pre-release mode", () => {
       setup.updatePackage("pkg-a", "1.0.1-next.0");
       setup.updatePackage("pkg-b", "1.0.1-next.0");

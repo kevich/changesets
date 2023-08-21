@@ -15,6 +15,7 @@ import { InternalError } from "@changesets/errors";
 import { Packages, Package } from "@manypkg/get-packages";
 import { getDependentsGraph } from "@changesets/get-dependents-graph";
 import { PreInfo, InternalRelease } from "./types";
+import { isListablePackage } from "./utils";
 
 type SnapshotReleaseParameters = {
   tag?: string | undefined;
@@ -151,7 +152,9 @@ function assembleReleasePlan(
       : snapshot;
 
   let packagesByName = new Map(
-    packages.packages.map((x) => [x.packageJson.name, x])
+    packages.packages
+      .filter((x) => isListablePackage(refinedConfig, x.packageJson))
+      .map((x) => [x.packageJson.name, x])
   );
 
   const relevantChangesets = getRelevantChangesets(

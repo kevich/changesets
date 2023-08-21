@@ -1,4 +1,4 @@
-import { PackageGroup, VersionType } from "@changesets/types";
+import { Config, PackageGroup, PackageJSON, VersionType } from "@changesets/types";
 import { Package } from "@manypkg/get-packages";
 import semverGt from "semver/functions/gt";
 import { InternalRelease } from "./types";
@@ -57,4 +57,19 @@ export function getCurrentHighestVersion(
   }
 
   return highestVersion!;
+}
+
+export function isListablePackage(config: Config, packageJson: PackageJSON) {
+  const packageIgnoredInConfig = config.ignore.includes(packageJson.name);
+
+  if (packageIgnoredInConfig) {
+    return false;
+  }
+
+  if (!config.privatePackages.version && packageJson.private) {
+    return false;
+  }
+
+  const hasVersionField = !!packageJson.version;
+  return hasVersionField;
 }
